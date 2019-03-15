@@ -18,22 +18,20 @@ install -m 644 log2zram.logrotate /etc/logrotate.d/log2zram
 
 # Make sure we start clean
 rm -rf /var/hdd.log
-# Make backup of pruned logs
-mkdir -p /var/oldlog
+mkdir -p /var/hdd.log
+mkdir -p /var/log/oldlog
 
-cp -rfup /var/log/*.1 /var/oldlog/
-cp -rfup /var/log/*.gz /var/oldlog/
-cp -rfup /var/log/*.old /var/oldlog/
+cp -rfp /var/log/*.1 /var/log/oldlog
+cp -rfp /var/log/*.gz /var/log/oldlog
+cp -rfp /var/log/*.old /var/log/oldlog
 # Prune logs
 rm -r /var/log/*.1
 rm -r /var/log/*.gz
 rm -r /var/log/*.old
 # Clone /var/log
-mkdir -p /var/hdd.log
-mkdir -p /var/log/oldlog
 # Prob better to use xcopy here with a --exclude
-rsync -arzh --exclude 'oldlog' /var/log/ /var/hdd.log/
-mkdir -p /var/hdd.log/oldlog
+rsync -arzh /var/log/ /var/hdd.log/
+
 sed -i '/^include.*/i olddir /var/log/oldlog' /etc/logrotate.conf
 
 echo "#####          Reboot to activate log2ram         #####"

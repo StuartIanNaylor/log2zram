@@ -6,7 +6,7 @@ HDD_LOG=/var/hdd.log
 ZRAM_LOG=/var/log
 
 LOG_NAME="/usr/local/bin/log2zram/log2zram.log"
-
+touch $LOG_NAME
 
 isSafe () {
 	[ -d $HDD_LOG/ ] || echo "ERROR: $HDD_LOG/ doesn't exist! Can't sync." >> $LOG_NAME
@@ -15,7 +15,7 @@ isSafe () {
 
 syncToDisk () {
 	isSafe
-	rsync -arzh $ZRAM_LOG/ $HDD_LOG/ 2>&1 | tee $LOG_NAME
+	rsync -arvzh $ZRAM_LOG/ $HDD_LOG/ 2>&1 | tee $LOG_NAME
 
 }
 
@@ -29,7 +29,7 @@ syncFromDisk () {
 		umount -l $HDD_LOG/
 		exit 1
 	fi
-	rsync -arzh --exclude 'oldlog'  $HDD_LOG/ $ZRAM_LOG/ 2>&1 | tee $LOG_NAME
+	rsync -arvzh --exclude='oldlog' $HDD_LOG/ $ZRAM_LOG/ 2>&1 | tee $LOG_NAME
 }
 
 wait_for () {
@@ -72,29 +72,23 @@ pruneOldLog() {
 
 case "$1" in
 	start)
-		[ -d $HDD_LOG/ ] || mkdir $HDD_LOG/
 		mount --bind $ZRAM_LOG/ $HDD_LOG/
 		mount --make-private $HDD_LOG/
 		wait_for $HDD_LOG
 		createZramLogDrive
-		mount -t ext4 -o nosuid,noexec,nodev,user=log2ram /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
+		mount -t ext4 -o nosuid,noexec,nodev /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
 		wait_for $ZRAM_LOG
 		syncFromDisk
 		;;
 
 	stop)
 		syncToDisk
-		#ZRAM_LOG=$(awk '$2 == "/var/log" {print $1}' /proc/mounts)
-		#ZRAM_LOG=$(echo ${ZRAM_LOG} | grep -o -E '[0-9]+')
 		umount -l $ZRAM_LOG/
 		umount -l $HDD_LOG/
-		# Unsure as even with Root permision denied
-		#echo ${ZRAM_LOG} > /sys/class/zram-control/hot_remove
 		;;
 
 	write)
 		pruneOldLog
-		#syncToDisk
 		;;
 
 	*)
