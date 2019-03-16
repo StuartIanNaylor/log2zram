@@ -1,0 +1,3 @@
+#!/bin/bash
+[ -d /usr/local/bin/log2zram ] && { echo "Log2Zram is already installed, uninstall first)"; exit 1; }
+

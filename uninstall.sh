@@ -10,11 +10,9 @@ then
   rm /etc/cron.hourly/log2zram
   rm /etc/logrotate.d/log2zram
   sudo sed -i '/olddir.*/d' /etc/logrotate.conf
-  if [ -d /var/hdd.log ]; then
-    rm -r /var/hdd.log
-  fi
+  
   echo "Log2Zram is uninstalled, removing the uninstaller in progress"
-  rm -rf /usr/local/bin/log2ram
+  rm -rf /usr/local/bin/log2zram
   echo "##### Reboot isn't needed #####"
 else
   echo "You need to be ROOT (sudo can be used)"

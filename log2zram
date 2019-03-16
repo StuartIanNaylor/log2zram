@@ -64,8 +64,8 @@ pruneOldLog() {
 	getUsage
 	LOG_REMAINING=$(( "( ${BYTES_AVAIL} * 100 ) / ( ${BYTES_AVAIL} + ${BYTES_USED} )" ))
 	if [ "$LOG_REMAINING" -lt "$PRUNE_LEVEL" ];then
-			rsync -arzh $ZRAM_LOG/oldlog/ $HDD_LOG/oldlog/ 
-			rm -rf $ZRAM_LOG/oldlog/* 
+			#rsync -arzh $ZRAM_LOG/oldlog/ $HDD_LOG/oldlog/ 
+			#rm -rf $ZRAM_LOG/oldlog/* 
 	fi
 	
 }
