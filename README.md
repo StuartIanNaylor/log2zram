@@ -89,4 +89,4 @@ Force the daily logrotate with verbose output
 ```
 chmod +x /usr/local/bin/uninstall-log2ram.sh && sudo /usr/local/bin/uninstall-log2ram.sh
 ```
-Also /var/oldlog contains the pruned logs from install delete if not required (prob not)
+/var/hdd.log is retained on uninstall and only removed on new install.
