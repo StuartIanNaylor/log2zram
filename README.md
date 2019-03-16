@@ -7,7 +7,7 @@ Log2Zam is a lower write fork https://github.com/azlux/log2ram based on transien
 Many thanks to Azlux for the great initial project.
 
 Can not be used for mission critical logging applications where a system crash and log loss is unaceptable.
-If the extremely unlikely event of a system crash is not a major concern then L2Z can massively reduce log block wear whilst maintinaing and extremely tiny memory footprint.
+If the extremely unlikely event of a system crash is not a major concern then L2Z can massively reduce log block wear whilst maintaining and extremely tiny memory footprint. Further resilience can be added by the use of a watchdog routine to force stop.
 
 _____
 ## Menu
