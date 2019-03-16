@@ -60,7 +60,7 @@ pi@raspberrypi:~/log2zram $ zramctl
 NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 /dev/zram0 lz4            60M  6.7M 903.5K  1.2M       1 /var/log
 ```
-L2Z creates a seperate log file /usr/local/bin/log2zram/log2zram.log if errors happen during mount and creation of /var/log
+L2Z creates a seperate log file /usr/local/bin/log2zram/log2zram.log if errors happen during mount and creation of /var/log or check syslog for normal operations.
 
 ### Testing
 ```
