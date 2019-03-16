@@ -30,6 +30,7 @@ syncFromDisk () {
 		exit 1
 	fi
 	rsync -arvzh --exclude='oldlog' $HDD_LOG/ $ZRAM_LOG/ 2>&1 | tee $LOG_NAME
+	mkdir -p /var/log/oldlog
 }
 
 wait_for () {
@@ -76,7 +77,7 @@ case "$1" in
 		mount --make-private $HDD_LOG/
 		wait_for $HDD_LOG
 		createZramLogDrive
-		mount -t ext4 -o nosuid,noexec,nodev /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
+		mount -t ext4 /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
 		wait_for $ZRAM_LOG
 		syncFromDisk
 		;;
