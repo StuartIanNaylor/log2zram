@@ -48,33 +48,30 @@ PRUNE_LEVEL=60
 ```
 
 #### refresh time:
-By default Log2Zram checks available log space every hour. It them makes a comparison of the percentage set via Prune_Level and only writes out old logs to disk when triggered and then removes the collected old logs from zram space.
+By default Log2Zram checks available log space every hour. It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space.
 
 ### It is working?
-You can now check the mount folder in ram with (You will see lines with log2ram if working)
 ```
-# df -h
+pi@raspberrypi:~/log2zram $ df "/var/log" -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/zram0       55M  2.6M   48M   6% /var/log
 …
-log2ram          40M  532K   40M   2% /var/log
-…
+pi@raspberrypi:~/log2zram $ zramctl
+NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
+/dev/zram0 lz4            60M  6.7M 903.5K  1.2M       1 /var/log
+```
+L2Z creates a seperate log file /usr/local/bin/log2zram/log2zram.log if errors happen during mount and creation of /var/log or check syslog for normal operations.
 
-# mount
-…
-log2ram on /var/log type tmpfs (rw,nosuid,nodev,noexec,relatime,size=40960k,mode=755)
-…
-```
 ### Testing
 ```
 sudo service log2ram reload
 ```
-Checks PRUNE_LEVEL < available free space if true will move and clean /var/log/oldlog to hdd.log
+Checks PRUNE_LEVEL > available free space % if true will move and clean /var/log/oldlog to hdd.log
 ```
 sudo logrotate -vf /etc/logrotate.conf
 ```
 Force the daily logrotate with verbose output
 
-
-The log for log2ram will be written at: `/var/log/log2ram.log`
 
 | Compressor name	     | Ratio	| Compression | Decompress. |
 |------------------------|----------|-------------|-------------|
@@ -92,4 +89,4 @@ The log for log2ram will be written at: `/var/log/log2ram.log`
 ```
 chmod +x /usr/local/bin/uninstall-log2ram.sh && sudo /usr/local/bin/uninstall-log2ram.sh
 ```
-Also /var/oldlog contains the pruned logs from install delete if not required (prob not)
+/var/hdd.log is retained on uninstall and only removed on new install.
