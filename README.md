@@ -69,7 +69,7 @@ L2Z creates a seperate log file /usr/local/bin/log2zram/log2zram.log if errors h
 ```
 sudo service log2ram reload
 ```
-Checks PRUNE_LEVEL < available free space if true will move and clean /var/log/oldlog to hdd.log
+Checks PRUNE_LEVEL > available free space if true will move and clean /var/log/oldlog to hdd.log
 ```
 sudo logrotate -vf /etc/logrotate.conf
 ```
