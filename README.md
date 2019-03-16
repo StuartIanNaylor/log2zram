@@ -57,11 +57,6 @@ pi@raspberrypi:~/log2zram $ df "/var/log" -h
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/zram0       55M  2.6M   48M   6% /var/log
 …
-
-# mount
-…
-log2ram on /var/log type tmpfs (rw,nosuid,nodev,noexec,relatime,size=40960k,mode=755)
-…
 pi@raspberrypi:~/log2zram $ zramctl
 NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 /dev/zram0 lz4            60M  6.7M 903.5K  1.2M       1 /var/log
