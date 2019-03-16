@@ -31,6 +31,8 @@ syncFromDisk () {
 	fi
 	rsync -arvzh --exclude='oldlog' $HDD_LOG/ $ZRAM_LOG/ 2>&1 | tee $LOG_NAME
 	mkdir -p /var/log/oldlog
+	chmod 754 /var/log/oldlog
+	chown root:adm /var/log/oldlog
 }
 
 wait_for () {
