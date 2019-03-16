@@ -53,9 +53,9 @@ By default Log2Zram checks available log space every hour. It them makes a compa
 ### It is working?
 You can now check the mount folder in ram with (You will see lines with log2ram if working)
 ```
-# df -h
-…
-log2ram          40M  532K   40M   2% /var/log
+pi@raspberrypi:~/log2zram $ df "/var/log" -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/zram0       55M  2.6M   48M   6% /var/log
 …
 
 # mount
