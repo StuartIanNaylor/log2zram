@@ -63,6 +63,8 @@ log2ram          40M  532K   40M   2% /var/log
 log2ram on /var/log type tmpfs (rw,nosuid,nodev,noexec,relatime,size=40960k,mode=755)
 …
 ```
+L2Z creates a seperate log file /usr/local/bin/log2zram/log2zram.log if errors happen during mount and creation of /var/log
+
 ### Testing
 ```
 sudo service log2ram reload
