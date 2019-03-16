@@ -48,7 +48,7 @@ PRUNE_LEVEL=60
 ```
 
 #### refresh time:
-By default Log2Zram checks available log space every hour. It them makes a comparison of the percentage set via Prune_Level and only writes out old logs to disk when triggered and then removes the collected old logs from zram space.
+By default Log2Zram checks available log space every hour. It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space.
 
 ### It is working?
 You can now check the mount folder in ram with (You will see lines with log2ram if working)
