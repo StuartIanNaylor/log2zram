@@ -76,8 +76,6 @@ sudo logrotate -vf /etc/logrotate.conf
 Force the daily logrotate with verbose output
 
 
-The log for log2ram will be written at: `/var/log/log2ram.log`
-
 | Compressor name	     | Ratio	| Compression | Decompress. |
 |------------------------|----------|-------------|-------------|
 |zstd 1.3.4 -1	         | 2.877	| 470 MB/s	  | 1380 MB/s   |
