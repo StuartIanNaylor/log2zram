@@ -51,7 +51,6 @@ PRUNE_LEVEL=60
 By default Log2Zram checks available log space every hour. It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space.
 
 ### It is working?
-You can now check the mount folder in ram with (You will see lines with log2ram if working)
 ```
 pi@raspberrypi:~/log2zram $ df "/var/log" -h
 Filesystem      Size  Used Avail Use% Mounted on
