@@ -34,7 +34,7 @@ SIZE=20M
 # COMP_ALG this is any compression algorithm listed in /proc/crypto
 # lz4 is fastest with lightest load but deflate (zlib) and Zstandard (zstd) give far better compression ratios
 # lzo is very close to lz4 and may with some binaries have better optimisation
-# COMP_ALG=lz4 for speed or deflate for compression, lzo or zlib if optimisation or availabilty is a problem
+# COMP_ALG=lz4 for speed or deflate for compression, lzo or zlib (deflate) if optimisation or availabilty is a problem
 COMP_ALG=lz4
 # LOG_DISK_SIZE is the uncompressed disk size. Note zram uses about 0.1% of the size of the disk when not in use
 # LOG_DISK_SIZE is expected compression ratio of alg chosen multiplied by log SIZE where 300% is an approx good level.
