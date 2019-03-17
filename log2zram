@@ -5,17 +5,14 @@
 HDD_LOG=/var/hdd.log
 ZRAM_LOG=/var/log
 
-LOG_NAME="/usr/local/bin/log2zram/log2zram.log"
-touch $LOG_NAME
-
 isSafe () {
-	[ -d $HDD_LOG/ ] || echo "ERROR: $HDD_LOG/ doesn't exist! Can't sync." >> $LOG_NAME
+	[ -d $HDD_LOG/ ] || echo "ERROR: $HDD_LOG/ doesn't exist! Can't sync." 
 	[ -d $HDD_LOG/ ] || exit 1
 }
 
 syncToDisk () {
 	isSafe
-	rsync -arvzh $ZRAM_LOG/ $HDD_LOG/ 2>&1 | tee $LOG_NAME
+	rsync -arvzh $ZRAM_LOG/ $HDD_LOG/ 
 
 }
 
@@ -24,12 +21,12 @@ syncFromDisk () {
 	getUsage
 	LOG_SIZE=$(du -sk $HDD_LOG/ | awk '{ print $1 }')
 	if [ "$BYTES_AVAIL" -lt "$LOG_SIZE" ];then
-		echo "ERROR: RAM disk too small. Can't sync." >> $LOG_NAME
+		echo "ERROR: RAM disk too small. Can't sync." 
 		umount -l $ZRAM_LOG/
 		umount -l $HDD_LOG/
 		exit 1
 	fi
-	rsync -arvzh --exclude='oldlog' $HDD_LOG/ $ZRAM_LOG/ 2>&1 | tee $LOG_NAME
+	rsync -arvzh --exclude='oldlog' $HDD_LOG/ $ZRAM_LOG/ 
 	mkdir -p /var/log/oldlog
 	chmod 754 /var/log/oldlog
 	chown root:adm /var/log/oldlog
@@ -44,7 +41,7 @@ wait_for () {
 createZramLogDrive () {
 	# Check Zram Class created
 	if [ ! -d "/sys/class/zram-control" ]; then
-		modprobe zram
+		modprobe --verbose zram
 		ZRAM_DEV='0'
 	else
 		ZRAM_DEV=$(cat /sys/class/zram-control/hot_add)
@@ -52,7 +49,7 @@ createZramLogDrive () {
 	echo ${COMP_ALG} > /sys/block/zram${ZRAM_DEV}/comp_algorithm
 	echo ${LOG_DISK_SIZE} > /sys/block/zram${ZRAM_DEV}/disksize
 	echo ${SIZE} > /sys/block/zram${ZRAM_DEV}/mem_limit
-	mke2fs -t ext4 /dev/zram${ZRAM_DEV}
+	mke2fs -v -t ext4 /dev/zram${ZRAM_DEV}
 }
 
 getUsage () {
@@ -75,11 +72,11 @@ pruneOldLog() {
 
 case "$1" in
 	start)
-		mount --bind $ZRAM_LOG/ $HDD_LOG/
-		mount --make-private $HDD_LOG/
+		mount --verbose --bind $ZRAM_LOG/ $HDD_LOG/
+		mount --verbose --make-private $HDD_LOG/
 		wait_for $HDD_LOG
 		createZramLogDrive
-		mount -t ext4 /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
+		mount --verbose --types ext4 /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
 		wait_for $ZRAM_LOG
 		syncFromDisk
 		;;
