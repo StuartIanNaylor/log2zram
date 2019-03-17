@@ -66,7 +66,7 @@ L2Z creates a seperate log file /usr/local/bin/log2zram/log2zram.log if errors h
 
 ### Testing
 ```
-sudo service log2ram reload
+sudo service log2zram reload
 ```
 Checks PRUNE_LEVEL > available free space % if true will move and clean /var/log/oldlog to hdd.log
 ```
