@@ -4,9 +4,10 @@ Usefull for IoT / maker projects for reducing SD, Nand and Emmc block wear via l
 Uses Zram to minimise precious memory footprint and extremely infrequent write outs.
 
 Log2Zam is a lower write fork https://github.com/azlux/log2ram based on transient log for Systemd here : [A transient /var/log](https://www.debian-administration.org/article/661/A_transient_/var/log)
+Many thanks to Azlux for the great initial project.
 
 Can not be used for mission critical logging applications where a system crash and log loss is unaceptable.
-If the extremely unlikely event of a system crash is not a major concern then L2Z can massively reduce log block wear whilst maintinaing and extremely tiny memory footprint.
+If the extremely unlikely event of a system crash is not a major concern then L2Z can massively reduce log block wear whilst maintaining and extremely tiny memory footprint. Further resilience can be added by the use of a watchdog routine to force stop.
 
 _____
 ## Menu
@@ -33,7 +34,8 @@ SIZE=20M
 # COMP_ALG this is any compression algorithm listed in /proc/crypto
 # lz4 is fastest with lightest load but deflate (zlib) and Zstandard (zstd) give far better compression ratios
 # lzo is very close to lz4 and may with some binaries have better optimisation
-# COMP_ALG=lz4 for speed or deflate for compression, lzo or zlib if optimisation or availabilty is a problem
+# COMP_ALG=lz4 for speed or deflate for compression, lzo or zlib (deflate) if optimisation or availabilty is a problem
+# zstd and deflate have excellent text compression ratios of almost double lzo & lz4
 COMP_ALG=lz4
 # LOG_DISK_SIZE is the uncompressed disk size. Note zram uses about 0.1% of the size of the disk when not in use
 # LOG_DISK_SIZE is expected compression ratio of alg chosen multiplied by log SIZE where 300% is an approx good level.
