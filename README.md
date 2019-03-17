@@ -53,7 +53,6 @@ PRUNE_LEVEL=60
 # LOGROTATE_FREQ=12 twice daily, LOGROTATE_FREQ=6 four times daily with LOGROTATE_FREQ=1 hourly
 LOGROTATE_FREQ=
 # PRUNE_FREQ will check if available space % is less than PRUNE_LEVEL and if so move and clean /oldlog
-# PRUNE_FREQ= Leave empty to turn off and no check will be made or will the old/log move and clean operation
 # PRUNE_FREQ=12 twice daily, PRUNE_FREQ=6 four times daily with PRUNE_FREQ=1 hourly
 PRUNE_FREQ=1
 ```
