@@ -34,8 +34,7 @@ SIZE=20M
 # COMP_ALG this is any compression algorithm listed in /proc/crypto
 # lz4 is fastest with lightest load but deflate (zlib) and Zstandard (zstd) give far better compression ratios
 # lzo is very close to lz4 and may with some binaries have better optimisation
-# COMP_ALG=lz4 for speed or deflate for compression, lzo or zlib (deflate) if optimisation or availabilty is a problem
-# zstd and deflate have excellent text compression ratios of almost double lzo & lz4
+# COMP_ALG=lz4 for speed or deflate for compression, lzo or zlib if optimisation or availabilty is a problem
 COMP_ALG=lz4
 # LOG_DISK_SIZE is the uncompressed disk size. Note zram uses about 0.1% of the size of the disk when not in use
 # LOG_DISK_SIZE is expected compression ratio of alg chosen multiplied by log SIZE where 300% is an approx good level.
@@ -47,10 +46,21 @@ LOG_DISK_SIZE=60M
 # In normal operation hitting 50% or above can take many hourly cycles so a higher prune level is a balance
 # 55-60% is probably a good level as too high will restart logrotation and create less history  
 PRUNE_LEVEL=60
+
+# ****************** Scheduler settings for logrotate override and prune frequencies **********************
+# LOGROTATE_FREQ & PRUNE_FREQ are the count in hours each operation will take place
+# LOGROTATE_FREQ= Leave empty to turn off and use normal cron daily
+# LOGROTATE_FREQ=12 twice daily, LOGROTATE_FREQ=6 four times daily with LOGROTATE_FREQ=1 hourly
+LOGROTATE_FREQ=
+# PRUNE_FREQ will check if available space % is less than PRUNE_LEVEL and if so move and clean /oldlog
+# PRUNE_FREQ= Leave empty to turn off and no check will be made or will the old/log move and clean operation
+# PRUNE_FREQ=12 twice daily, PRUNE_FREQ=6 four times daily with PRUNE_FREQ=1 hourly
+PRUNE_FREQ=1
 ```
 
 #### refresh time:
-By default Log2Zram checks available log space every hour. It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space.
+By default Log2Zram checks available log space every hour (PRUNE_FREQ=1). It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space.
+For low space considerations you can also increase the daily logrotate by setting LOGROTATE_FREQ=6 for 4 times daily if left as LOGROTATE_FREQ= then this function remains off and normal daily cron Logrotate will function
 
 ### It is working?
 ```
@@ -62,11 +72,10 @@ pi@raspberrypi:~/log2zram $ zramctl
 NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 /dev/zram0 lz4            60M  6.7M 903.5K  1.2M       1 /var/log
 ```
-L2Z creates a seperate log file /usr/local/bin/log2zram/log2zram.log if errors happen during mount and creation of /var/log or check syslog for normal operations.
 
 ### Testing
 ```
-sudo service log2zram reload
+sudo /usr/local/bin/log2zram/log2zram prune
 ```
 Checks PRUNE_LEVEL > available free space % if true will move and clean /var/log/oldlog to hdd.log
 ```
@@ -76,7 +85,7 @@ Force the daily logrotate with verbose output
 
 If you get into a situation where the initial /var/log size is bigger than the initial available disk size do the following.
 logrotate -vf /etc/logrotate.conf as due to the olddir directive this will move the current logs to /oldlog
-sudo service log2zram reload will prune those logs to hhd.log
+sudo /usr/local/bin/log2zram/log2zram prune will prune those logs to hhd.log
 If log bloat was due to some problem you may keep current /etc/log2zram.conf setting or increase the Size and corresponding Log_Disk_Size to compensate.
 
 
@@ -94,6 +103,6 @@ If log bloat was due to some problem you may keep current /etc/log2zram.conf set
 
 ## Uninstall
 ```
-chmod +x /usr/local/bin/uninstall-log2ram.sh && sudo /usr/local/bin/uninstall-log2ram.sh
+sudo sh /usr/local/bin/log2zram/uninstall.sh
 ```
 /var/hdd.log is retained on uninstall and only removed on new install.
