@@ -66,13 +66,18 @@ L2Z creates a seperate log file /usr/local/bin/log2zram/log2zram.log if errors h
 
 ### Testing
 ```
-sudo service log2ram reload
+sudo service log2zram reload
 ```
 Checks PRUNE_LEVEL > available free space % if true will move and clean /var/log/oldlog to hdd.log
 ```
 sudo logrotate -vf /etc/logrotate.conf
 ```
 Force the daily logrotate with verbose output
+
+If you get into a situation where the initial /var/log size is bigger than the initial available disk size do the following.
+logrotate -vf /etc/logrotate.conf as due to the olddir directive this will move the current logs to /oldlog
+sudo service log2zram reload will prune those logs to hhd.log
+If log bloat was due to some problem you may keep current /etc/log2zram.conf setting or increase the Size and corresponding Log_Disk_Size to compensate.
 
 
 | Compressor name	     | Ratio	| Compression | Decompress. |
