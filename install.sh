@@ -10,13 +10,11 @@ mkdir -p /usr/local/bin/log2zram
 install -m 644 log2zram.service /etc/systemd/system/log2zram.service
 install -m 755 log2zram /usr/local/bin/log2zram/log2zram
 install -m 644 log2zram.conf /etc/log2zram.conf
-install -m 644 log2zram.log /usr/local/bin/log2zram/log2zram.log
+install -m 755 log2zram-schd /usr/local/bin/log2zram/log2zram-schd
+install -m 644 log2zram-schd-pid /usr/local/bin/log2zram/log2zram-schd-pid
 install -m 644 uninstall.sh /usr/local/bin/log2zram/uninstall.sh
 systemctl enable log2zram
 
-# cron
-install -m 755 log2zram.hourly /etc/cron.hourly/log2zram
-install -m 644 log2zram.logrotate /etc/logrotate.d/log2zram
 
 # Make sure we start clean
 rm -rf /var/hdd.log

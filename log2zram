@@ -79,15 +79,25 @@ case "$1" in
 		mount --verbose --types ext4 /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
 		wait_for $ZRAM_LOG
 		syncFromDisk
+		if [  "$LOGROTATE_FREQ" -gt 0  ]
+		then
+			mv -f /etc/cron.daily/logrotate /usr/local/bin/log2zram/logrotate
+		fi
+		nohup /usr/local/bin/log2zram/log2zram-schd > /dev/null 2>&1 &
 		;;
 
 	stop)
 		syncToDisk
 		umount -l $ZRAM_LOG/
 		umount -l $HDD_LOG/
+		kill $(cat /usr/local/bin/log2zram/log2zram-schd-pid)
+		if [  "$LOGROTATE_FREQ" -gt 0  ]
+		then
+			mv /usr/local/bin/log2zram/logrotate /etc/cron.daily/logrotate
+		fi
 		;;
 
-	write)
+	prune)
 		pruneOldLog
 		;;
 

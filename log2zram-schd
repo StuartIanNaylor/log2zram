@@ -1,0 +1,30 @@
+#!/bin/bash
+. /etc/log2zram.conf
+
+echo $$ > /usr/local/bin/log2zram/log2zram-schd-pid
+
+ROTATE_COUNTER=0
+PRUNE_COUNTER=0
+while :
+do
+	sleep 3600
+	ROTATE_COUNTER=$((ROTATE_COUNTER + 1))
+	PRUNE_COUNTER=$((PRUNE_COUNTER + 1))
+	
+	if [ ! -z "$LOGROTATE_FREQ" ]
+	then
+		if [  "$LOGROTATE_FREQ" -eq "$ROTATE_COUNTER"  ]
+		then
+			logrotate -f /etc/logrotate.conf
+			ROTATE_COUNTER=0
+		fi
+	else
+		ROTATE_COUNTER=0
+	fi
+	
+	if [  "$PRUNE_FREQ" -eq "$PRUNE_COUNTER"  ]
+	then
+		sh /usr/local/bin/log2zram/log2zram prune
+		PRUNE_COUNTER=0
+	fi
+done
