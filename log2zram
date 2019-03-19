@@ -3,6 +3,7 @@
 . /etc/log2zram.conf
 
 HDD_LOG=/var/hdd.log
+PRUNE_LOG_LOG=/var/prune.log
 ZRAM_LOG=/var/log
 
 isSafe () {
@@ -12,8 +13,7 @@ isSafe () {
 
 syncToDisk () {
 	isSafe
-	rsync -arvzh $ZRAM_LOG/ $HDD_LOG/ 
-
+	cp -arvfu $ZRAM_LOG -T $HDD_LOG
 }
 
 syncFromDisk () {
@@ -22,21 +22,14 @@ syncFromDisk () {
 	LOG_SIZE=$(du -sk $HDD_LOG/ | awk '{ print $1 }')
 	if [ "$BYTES_AVAIL" -lt "$LOG_SIZE" ];then
 		echo "ERROR: RAM disk too small. Can't sync." 
-		umount -l $ZRAM_LOG/
-		umount -l $HDD_LOG/
-		exit 1
+			cp -arvf $HDD_LOG -T $PRUNE_LOG
+			rm -rf $HDD_LOG/oldlog/* 
+			exit 1
 	fi
-	rsync -arvzh --exclude='oldlog' $HDD_LOG/ $ZRAM_LOG/ 
-	mkdir -p /var/log/oldlog
-	chmod 754 /var/log/oldlog
-	chown root:adm /var/log/oldlog
+	cp -arvf $HDD_LOG -T $ZRAM_LOG || exit 1
 }
 
-wait_for () {
-	while ! grep -qs "$1" /proc/mounts; do
-		sleep 0.1
-	done
-}
+
 
 createZramLogDrive () {
 	# Check Zram Class created
@@ -59,27 +52,15 @@ getUsage () {
 }
 
 
-pruneOldLog() {
-	isSafe
-	getUsage
-	LOG_REMAINING=$(( ${BYTES_AVAIL} * 100  / (${BYTES_AVAIL} + ${BYTES_USED}) ))
-	if [ "$LOG_REMAINING" -lt "$PRUNE_LEVEL" ];then
-			rsync -avrzh $ZRAM_LOG/oldlog/ $HDD_LOG/oldlog/ 
-			rm -rf $ZRAM_LOG/oldlog/* 
-	fi
-	
-}
-
 case "$1" in
 	start)
 		mount --verbose --bind $ZRAM_LOG/ $HDD_LOG/
 		mount --verbose --make-private $HDD_LOG/
-		wait_for $HDD_LOG
 		createZramLogDrive
-		mount --verbose --types ext4 /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
-		wait_for $ZRAM_LOG
+		mount --verbose --types ext4 -o nosuid,noexec,nodev /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
+		sync
 		syncFromDisk
-		if [  "$LOGROTATE_FREQ" -gt 0  ]
+		if [ ! -z "$LOGROTATE_FREQ" ]
 		then
 			mv -f /etc/cron.daily/logrotate /usr/local/bin/log2zram/logrotate
 		fi
@@ -87,18 +68,14 @@ case "$1" in
 		;;
 
 	stop)
+		kill $(cat /usr/local/bin/log2zram/log2zram-schd-pid)
 		syncToDisk
 		umount -l $ZRAM_LOG/
 		umount -l $HDD_LOG/
-		kill $(cat /usr/local/bin/log2zram/log2zram-schd-pid)
-		if [  "$LOGROTATE_FREQ" -gt 0  ]
+		if [ ! -z "$LOGROTATE_FREQ" ]
 		then
-			mv /usr/local/bin/log2zram/logrotate /etc/cron.daily/logrotate
+			cp /usr/local/bin/log2zram/logrotate /etc/cron.daily/logrotate
 		fi
-		;;
-
-	prune)
-		pruneOldLog
 		;;
 
 	*)

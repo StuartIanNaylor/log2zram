@@ -18,22 +18,19 @@ systemctl enable log2zram
 
 # Make sure we start clean
 rm -rf /var/hdd.log
-mkdir -p /var/hdd.log
 mkdir -p /var/log/oldlog
-chmod 754 /var/log/oldlog
-chown root:adm /var/log/oldlog
+mkdir -p /var/hdd.log
+mkdir -p /var/prune.log
 
 # Prune logs
-cp -au /var/log/*.1 /var/log/oldlog > /dev/null 2>&1 &
-cp -au /var/log/*.gz /var/log/oldlog > /dev/null 2>&1 &
-cp -au /var/log/*.old /var/log/oldlog > /dev/null 2>&1 &
+cp -a /var/log/*.1 /var/prune.log > /dev/null 2>&1 &
+cp -a /var/log/*.gz /var/prune.log > /dev/null 2>&1 &
+cp -a /var/log/*.old /var/prune.log > /dev/null 2>&1 &
 
 rm -r /var/log/*.1 > /dev/null 2>&1 &
 rm -r /var/log/*.gz > /dev/null 2>&1 &
 rm -r /var/log/*.old > /dev/null 2>&1 &
-# Clone /var/log
-echo "#####               Clone /var/log                 #####"
-rsync -arzhv /var/log/ /var/hdd.log/
+
 
 sed -i '/^weekly.*/i olddir /var/log/oldlog' /etc/logrotate.conf
 

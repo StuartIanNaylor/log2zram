@@ -3,28 +3,47 @@
 
 echo $$ > /usr/local/bin/log2zram/log2zram-schd-pid
 
-ROTATE_COUNTER=0
-PRUNE_COUNTER=0
+PRUNE_LOG=/var/prune.log
+ZRAM_LOG=/var/log
+
+getUsage () {
+	BYTES_AVAIL=$(df "/var/log" | tail -1 | awk '{ print $4 }')
+	BYTES_USED=$(df "/var/log" | tail -1 | awk '{ print $3 }')
+	
+}
+
+pruneOldLog() {
+	getUsage
+	LOG_REMAINING=$(( ${BYTES_AVAIL} * 100  / (${BYTES_AVAIL} + ${BYTES_USED}) ))
+	if [ "$LOG_REMAINING" -lt "$PRUNE_LEVEL" ];then
+			cp -arvf $ZRAM_LOG -T $PRUNE_LOG 2>&1 | logger &
+			rm -rf $ZRAM_LOG/oldlog/* 
+	fi
+	
+}
+
+ROTATE_COUNTER=1
+PRUNE_COUNTER=1
 while :
 do
-	sleep 3600
+	sleep 60
 	ROTATE_COUNTER=$((ROTATE_COUNTER + 1))
 	PRUNE_COUNTER=$((PRUNE_COUNTER + 1))
 	
 	if [ ! -z "$LOGROTATE_FREQ" ]
 	then
-		if [  "$LOGROTATE_FREQ" -eq "$ROTATE_COUNTER"  ]
+		if [  "$LOGROTATE_FREQ" -lt "$ROTATE_COUNTER"  ]
 		then
-			logrotate -f /etc/logrotate.conf
-			ROTATE_COUNTER=0
+			echo "log2zram-sch forced logrotate"  2>&1 | logger &
+			/usr/sbin/logrotate -vf /etc/logrotate.conf 2>&1 | logger &
+			ROTATE_COUNTER=1
 		fi
-	else
-		ROTATE_COUNTER=0
 	fi
+
 	
-	if [  "$PRUNE_FREQ" -eq "$PRUNE_COUNTER"  ]
+	if [  "$PRUNE_FREQ" -lt "$PRUNE_COUNTER"  ]
 	then
-		sh /usr/local/bin/log2zram/log2zram prune
-		PRUNE_COUNTER=0
+		pruneOldLog
+		PRUNE_COUNTER=1
 	fi
 done

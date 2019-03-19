@@ -11,7 +11,6 @@ Conflicts=shutdown.target reboot.target halt.target
 Type=oneshot
 ExecStart= /usr/local/bin/log2zram/log2zram start
 ExecStop= /usr/local/bin/log2zram/log2zram stop
-ExecReload= /usr/local/bin/log2zram/log2zram write
 TimeoutStartSec=120
 RemainAfterExit=yes
 
