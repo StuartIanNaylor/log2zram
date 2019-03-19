@@ -79,7 +79,7 @@ case "$1" in
 		;;
 
 	*)
-		echo "Usage: log2ram {start|stop|write}" >&2
+		echo "Usage: log2ram {start|stop}" >&2
 		exit 1
 	;;
 esac
