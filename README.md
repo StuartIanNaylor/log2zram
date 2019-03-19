@@ -48,18 +48,18 @@ LOG_DISK_SIZE=60M
 PRUNE_LEVEL=60
 
 # ****************** Scheduler settings for logrotate override and prune frequencies **********************
-# LOGROTATE_FREQ & PRUNE_FREQ are the count in hours each operation will take place
-# LOGROTATE_FREQ= Leave empty to turn off and use normal cron daily
-# LOGROTATE_FREQ=12 twice daily, LOGROTATE_FREQ=6 four times daily with LOGROTATE_FREQ=1 hourly
+# LOGROTATE_FREQ & PRUNE_FREQ are the count in minutes each operation will take place
+# LOGROTATE_FREQ= Leave empty to turn off and use normal cron daily or forced logrotate will take place
+# LOGROTATE_FREQ=minutes
 LOGROTATE_FREQ=
 # PRUNE_FREQ will check if available space % is less than PRUNE_LEVEL and if so move and clean /oldlog
-# PRUNE_FREQ=12 twice daily, PRUNE_FREQ=6 four times daily with PRUNE_FREQ=1 hourly
-PRUNE_FREQ=1
+# PRUNE_FREQ=minutes
+PRUNE_FREQ=60
 ```
 
 #### refresh time:
-By default Log2Zram checks available log space every hour (PRUNE_FREQ=1). It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space.
-For low space considerations you can also increase the daily logrotate by setting LOGROTATE_FREQ=6 for 4 times daily if left as LOGROTATE_FREQ= then this function remains off and normal daily cron Logrotate will function
+By default Log2Zram checks available log space every hour (PRUNE_FREQ=60). It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space.
+For low space considerations you can also increase the daily logrotate by setting LOGROTATE_FREQ=360 for 4 times daily if left as LOGROTATE_FREQ= then this function remains off and normal daily cron Logrotate will function or forced logrotate will take place
 
 ### It is working?
 ```
@@ -73,19 +73,6 @@ NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 ```
 
 ### Testing
-```
-sudo /usr/local/bin/log2zram/log2zram prune
-```
-Checks PRUNE_LEVEL > available free space % if true will move and clean /var/log/oldlog to hdd.log
-```
-sudo logrotate -vf /etc/logrotate.conf
-```
-Force the daily logrotate with verbose output
-
-If you get into a situation where the initial /var/log size is bigger than the initial available disk size do the following.
-logrotate -vf /etc/logrotate.conf as due to the olddir directive this will move the current logs to /oldlog
-sudo /usr/local/bin/log2zram/log2zram prune will prune those logs to hhd.log
-If log bloat was due to some problem you may keep current /etc/log2zram.conf setting or increase the Size and corresponding Log_Disk_Size to compensate.
 
 
 | Compressor name	     | Ratio	| Compression | Decompress. |
@@ -104,4 +91,4 @@ If log bloat was due to some problem you may keep current /etc/log2zram.conf set
 ```
 sudo sh /usr/local/bin/log2zram/uninstall.sh
 ```
-/var/hdd.log is retained on uninstall and only removed on new install.
+/var/hdd.log /var/prune.log is retained on uninstall and only removed on new install.
