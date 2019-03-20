@@ -50,10 +50,10 @@ LOGROTATE_FREQ=
 # PRUNE_FREQ will check if available space % is less than PRUNE_LEVEL and if so move and clean /oldlog
 # PRUNE_FREQ=minutes
 PRUNE_FREQ=60
-# PRUNE_LEVEL if log size is below this level then old logs will be moved to hdd.log enter as %
+# PRUNE_LEVEL if log size is below this level then old logs will be moved to hdd.log enter as % of free space
 # Moving the old logs will restart log rotation as old logs will no longer exist in /var/log/oldlog
 # In normal operation hitting 50% or above can take many hourly cycles so a higher prune level is a balance
-# 55-60% is probably a good level as too high will restart logrotation and create less history  
+# 40-60% is probably a good level as too high will restart logrotation and create less history  
 PRUNE_LEVEL=60
 ```
 
