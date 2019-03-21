@@ -74,7 +74,10 @@ NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 ```
 
 ### Testing
-
+```
+sudo sh /usr/local/bin/log2zram/log2zram write
+```
+Writes out any updated logs to persistant HDD Dir
 
 | Compressor name	     | Ratio	| Compression | Decompress. |
 |------------------------|----------|-------------|-------------|
