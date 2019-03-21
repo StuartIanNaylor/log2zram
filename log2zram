@@ -77,6 +77,11 @@ case "$1" in
 			cp /usr/local/bin/log2zram/logrotate /etc/cron.daily/logrotate
 		fi
 		;;
+		
+	write)
+		echo 'log2zram: writeToHdd'  2>&1 | logger &
+		cp -arvfu $ZRAM_LOG -T $HDD_LOG 2>&1 | logger &
+		;;
 
 	*)
 		echo "Usage: log2ram {start|stop}" >&2
