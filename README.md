@@ -74,18 +74,19 @@ NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 ```
 
 ### Testing
+Writes out any updated logs to persistant HDD Dir
 ```
 sudo sh /usr/local/bin/log2zram/log2zram write
 ```
-Writes out any updated logs to persistant HDD Dir
+Force verbose logrotate
 ```
 sudo logrotate -vf /etc/logrotate.conf
 ```
-Force verbose logrotate
+Remove all old logs
 ```
 sudo rm -rf /var/log/oldlog/*
 ```
-Remove all old logs
+
 
 
 | Compressor name	     | Ratio	| Compression | Decompress. |
