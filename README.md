@@ -60,7 +60,7 @@ PRUNE_LEVEL=30
 ```
 
 #### refresh time:
-By default Log2Zram checks available log space every hour (PRUNE_FREQ=60). It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space.
+By default Log2Zram checks available log space every hour (PRUNE_FREQ=60). It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space. PRUNE_FREQ= Leave empty to disable
 For low space considerations you can also increase the daily logrotate by setting LOGROTATE_FREQ=360 for 4 times daily if left as LOGROTATE_FREQ= then this function remains off and normal daily cron Logrotate will function or forced logrotate will take place
 
 ### It is working?
