@@ -75,11 +75,11 @@ NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 ```
 
 ### Testing
-Force write out any updated logs to persistant HDD Dir
+Force write out any updated logs to persistant HDD Dir. Useful if new app install/changes rather than start/stop or reboot
 ```
 sudo sh /usr/local/bin/log2zram/log2zram write
 ```
-Force prune of oldlog (copy to prune.log then delete oldlog contents)
+Force prune of oldlog (copy to prune.log then delete oldlog contents). When tuning start log2zram with clean oldlog
 ```
 sudo sh /usr/local/bin/log2zram/log2zram prune
 ```
