@@ -74,9 +74,13 @@ NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 ```
 
 ### Testing
-Writes out any updated logs to persistant HDD Dir
+Force write out any updated logs to persistant HDD Dir
 ```
 sudo sh /usr/local/bin/log2zram/log2zram write
+```
+Force prune of oldlog (copy to hhd.prune then delete)
+```
+sudo sh /usr/local/bin/log2zram/log2zram prune
 ```
 Force verbose logrotate
 ```
