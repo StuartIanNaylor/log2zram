@@ -102,7 +102,7 @@ sudo logrotate -vf /etc/logrotate.conf
 |lzf 3.6 -1	             | 2.077	| 400 MB/s	  | 860 MB/s    |
 
 Zstd & Zlib are great for text compression where ratios of up to 3.3 can be obtained. Generally 230% for LZO/LZ4 LOG_DISK_SIZE over the Mem_Limit of Size should be OK, with Zlib/Zstd maybe even up to 350% can be expected.
-Most logrotate schedules compress after the second stored log and the ratio between uncompressed and compressed log can have much effect. So it dependent on your logging setup with LZO/LZ4 ranging from 210-250% ZSTD/ZLIB 290-350% for the same Mem_Limit Size.
+Most logrotate schedules compress after the second stored log (log.1) and the ratio between uncompressed and compressed log can have much effect. So it dependent on your logging setup with LZO/LZ4 ranging from 210-250% ZSTD/ZLIB 290-350% for the same Mem_Limit Size.
 Generally these are minimum compression rates but how much whitespace and zeroes does a file contain? 
 
 ## Uninstall
