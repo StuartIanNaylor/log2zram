@@ -78,6 +78,15 @@ NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
 sudo sh /usr/local/bin/log2zram/log2zram write
 ```
 Writes out any updated logs to persistant HDD Dir
+```
+sudo logrotate -vf /etc/logrotate.conf
+```
+Force verbose logrotate
+```
+sudo rm -rf /var/log/oldlog/*
+```
+Remove all old logs
+
 
 | Compressor name	     | Ratio	| Compression | Decompress. |
 |------------------------|----------|-------------|-------------|
