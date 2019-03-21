@@ -86,10 +86,6 @@ Force verbose logrotate
 ```
 sudo logrotate -vf /etc/logrotate.conf
 ```
-Remove all old logs
-```
-sudo rm -rf /var/log/oldlog/*
-```
 
 
 
