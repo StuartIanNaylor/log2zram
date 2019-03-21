@@ -78,7 +78,7 @@ Force write out any updated logs to persistant HDD Dir
 ```
 sudo sh /usr/local/bin/log2zram/log2zram write
 ```
-Force prune of oldlog (copy to hhd.prune then delete)
+Force prune of oldlog (copy to prune.log then delete oldlog contents)
 ```
 sudo sh /usr/local/bin/log2zram/log2zram prune
 ```
