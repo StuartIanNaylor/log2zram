@@ -9,6 +9,7 @@ Many thanks to Azlux for the great initial project.
 Can not be used for mission critical logging applications where a system crash and log loss is unaceptable.
 If the extremely unlikely event of a system crash is not a major concern then L2Z can massively reduce log block wear whilst maintaining and extremely tiny memory footprint. Further resilience can be added by the use of a watchdog routine to force stop.
 
+Works well in conjunction with https://github.com/StuartIanNaylor/zramdrive and https://github.com/StuartIanNaylor/zram-swap-config
 _____
 ## Menu
 1. [Install](#install)
