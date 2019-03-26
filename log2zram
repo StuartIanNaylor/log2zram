@@ -86,7 +86,8 @@ case "$1" in
 	prune)
 		echo 'log2zram: pruneOldlog'  2>&1 | logger &
 		cp -arvfu $ZRAM_LOG -T $PRUNE_LOG 2>&1 | logger &
-		rm -rf $ZRAM_LOG/oldlog/* 
+		rm -rf $ZRAM_LOG/oldlog/*
+		;;
 
 	*)
 		echo "Usage: log2ram {start|stop|write|prune}" >&2
