@@ -27,70 +27,60 @@ _____
 
 ## Customize
 #### variables :
-In the file `/etc/log2zram.conf` sudo nano /etc/log2zram.conf to edit:
+In the file `/etc/log2zram.conf` `sudo nano /etc/log2zram.conf` to edit:
 ```
 # Size for the zram memory used, it defines the mem_limit for the zram device.
 # The default is 20M and is basically enough for minimal applications.
 # Because aplications can often vary in logging frequency this may have to be tweaked to suit application .
 SIZE=20M
+
 # COMP_ALG this is any compression algorithm listed in /proc/crypto
 # lz4 is fastest with lightest load but deflate (zlib) and Zstandard (zstd) give far better compression ratios
 # lzo is very close to lz4 and may with some binaries have better optimisation
 # COMP_ALG=lz4 for speed or deflate for compression, lzo or zlib if optimisation or availabilty is a problem
 COMP_ALG=lz4
+
 # LOG_DISK_SIZE is the uncompressed disk size. Note zram uses about 0.1% of the size of the disk when not in use
 # LOG_DISK_SIZE is expected compression ratio of alg chosen multiplied by log SIZE where 300% is an approx good level.
 # lzo/lz4=2.1:1 compression ratio zlib=2.7:1 zstandard=2.9:1
 # Really a guestimate of a bit bigger than compression ratio whilst minimising 0.1% mem usage of disk size
 LOG_DISK_SIZE=60M
 
-# ****************** Scheduler settings for logrotate override and prune frequencies **********************
-# LOGROTATE_FREQ & PRUNE_FREQ are the count in minutes each operation will take place
-# LOGROTATE_FREQ= Leave empty to turn off and use normal cron daily or forced logrotate will take place
-# LOGROTATE_FREQ=minutes
-LOGROTATE_FREQ=
-# PRUNE_FREQ will check if available space % is less than PRUNE_LEVEL and if so move and clean /oldlog
-# PRUNE_FREQ= Leave empty to disable 
-# PRUNE_FREQ=minutes
-PRUNE_FREQ=60
-# PRUNE_LEVEL if log size is below this level then old logs will be moved to hdd.log enter as % of free space
-# Moving the old logs will restart log rotation as old logs will no longer exist in /var/log/oldlog
-# In normal operation hitting 50% or above can take many hourly cycles so a higher prune level is a balance
-# 20-40% is probably a good level as too high will restart logrotation and create less history, too low and increase
-# the chance of running out of space
-PRUNE_LEVEL=30
-```
+# mke2fs & mount drive options set for max write perf in volatile ram
+# https://manpages.debian.org/jessie/e2fsprogs/mke2fs.8.en.html
+# https://manpages.debian.org/stretch/mount/mount.8.en.html
+MKFS_OPTS="-O ^has_journal"
+MNT_OPTS="-o rw,noatime,async,nosuid,noexec,nodev,nobarrier,nodelalloc"
 
-#### refresh time:
-By default Log2Zram checks available log space every hour (PRUNE_FREQ=60). It them makes a comparison of the available space percentage against Prune_Level and only writes out old logs to disk when triggered (if lower) and then removes the collected old logs from zram space. PRUNE_FREQ= Leave empty to disable
-For low space considerations you can also increase the daily logrotate by setting LOGROTATE_FREQ=360 for 4 times daily if left as LOGROTATE_FREQ= then this function remains off and normal daily cron Logrotate will function or forced logrotate will take place
+# Zram & mount directories defaults can be changed if wished
+ZDIR=/opt/zram
+HDD_LOG=/opt/zram/hdd.log
+```
 
 ### It is working?
 ```
-pi@raspberrypi:~/log2zram $ df "/var/log" -h
+pi@raspberrypi:~ $ df -h
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/zram0       55M  2.6M   48M   6% /var/log
-…
-pi@raspberrypi:~/log2zram $ zramctl
+/dev/root        15G  1.2G   13G   9% /
+devtmpfs        460M     0  460M   0% /dev
+tmpfs           464M     0  464M   0% /dev/shm
+tmpfs           464M  6.2M  458M   2% /run
+tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+tmpfs           464M     0  464M   0% /sys/fs/cgroup
+/dev/mmcblk0p1   44M   22M   22M  50% /boot
+/dev/zram0       59M  920K   54M   2% /opt/zram/zram0
+overlay0         59M  920K   54M   2% /var/log
+tmpfs            93M     0   93M   0% /run/user/1000
+```
+```
+pi@raspberrypi:~ $ zramctl
 NAME       ALGORITHM DISKSIZE  DATA  COMPR TOTAL STREAMS MOUNTPOINT
-/dev/zram0 lz4            60M  6.7M 903.5K  1.2M       1 /var/log
+/dev/zram0 lz4            60M 1004K 212.3K  424K       4 /opt/zram/zram0
 ```
-
-### Testing
-Force write out any updated logs to persistant HDD Dir. Useful if new app install/changes rather than start/stop or reboot
 ```
-sudo sh /usr/local/bin/log2zram/log2zram write
+pi@raspberrypi:~ $ ls /usr/local/share/log2zram/log
+log2zram.log
 ```
-Force prune of oldlog (copy to prune.log then delete oldlog contents). When tuning start log2zram with clean oldlog
-```
-sudo sh /usr/local/bin/log2zram/log2zram prune
-```
-Force verbose logrotate
-```
-sudo logrotate -vf /etc/logrotate.conf
-```
-
-
 
 | Compressor name	     | Ratio	| Compression | Decompress. |
 |------------------------|----------|-------------|-------------|
@@ -111,7 +101,6 @@ Generally these are minimum compression rates but how much whitespace and zeroes
 ```
 sudo sh /usr/local/bin/log2zram/uninstall.sh
 ```
-/var/hdd.log /var/prune.log is retained on uninstall and only removed on new install.
 
 ## Git Branches & Update
 From the command line, enter `cd <path_to_local_repo>` so that you can enter commands for your repository.
