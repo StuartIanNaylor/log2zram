@@ -16,6 +16,7 @@ install -m 644 log2zram.service /etc/systemd/system/log2zram.service
 install -m 755 log2zram /usr/local/bin/log2zram
 install -m 644 log2zram.conf /etc/log2zram.conf
 install -m 644 uninstall.sh /usr/local/share/log2zram/uninstall.sh
+install -m 644 log2zram.logrotate /etc/logrotate.d/00_log2zram
 mkdir -p /usr/local/lib/log2zram/
 install -m 755 overlayfs-tools/overlay /usr/local/lib/log2zram/overlay
 mkdir -p /usr/local/share/log2zram/log

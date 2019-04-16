@@ -7,7 +7,7 @@ then
 	rm /etc/systemd/system/log2zram.service
 	rm /usr/local/bin/log2zram
 	rm /etc/log2zram.conf
-
+	rm /etc/logrotate.d/00_log2zram
 	echo "Log2Zram is uninstalled, removing the uninstaller in progress"
 	rm -rf /usr/local/share/log2zram
 	rm -rf /usr/local/lib/log2zram

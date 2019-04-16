@@ -5,7 +5,7 @@
 
 ZRAM_LOG=/var/log
 ZSHARE=/usr/local/share/log2zram
-ZLOG=${ZSHARE}/log/zram-config.log
+ZLOG=${ZSHARE}/log/log2zram.log
 
 
 createZramLogDrive () {
@@ -44,6 +44,7 @@ case "$1" in
 		mount --verbose --types overlay -o redirect_dir=off,lowerdir=${HDD_LOG},upperdir=${ZDIR}/zram${DEV_NUM}/upper,workdir=${ZDIR}/zram${DEV_NUM}/workdir overlay${DEV_NUM} ${ZRAM_LOG} >>${ZLOG} 2>&1 || exit 1
 		echo "/zram${DEV_NUM}" > ${ZSHARE}/zram-device-list
 		invoke-rc.d rsyslog restart >>${ZLOG} 2>&1 || exit 1
+		journalctl --flush >>${ZLOG} 2>&1 || exit 1
 		;;
 
 	stop)
