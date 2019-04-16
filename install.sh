@@ -10,12 +10,9 @@ install -m 644 log2zram.service /etc/systemd/system/log2zram.service
 install -m 755 log2zram /usr/local/bin/log2zram
 install -m 644 log2zram.conf /etc/log2zram.conf
 install -m 644 uninstall.sh /usr/local/share/log2zram/uninstall.sh
+mkdir -p /usr/local/share/log2zram/log
 systemctl enable log2zram
 
 
-# Make sure we start clean
-rm -rf /var/hdd.log
-mkdir -p /var/hdd.log
-mkdir -p /usr/local/share/log2zram/log
 
 

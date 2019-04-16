@@ -41,30 +41,29 @@ case "$1" in
 	stop)
 		echo "log2zram stop $(date +%Y-%m-%d-%H:%M:%S)" >>${ZLOG}
 		ZRAM_DEV=$(cat ${ZSHARE}/zram-device-list)
-		invoke-rc.d rsyslog stop >>${ZLOG} 2>&1 || exit 1
-		if umount --verbose ${ZRAM_LOG}/
+		invoke-rc.d rsyslog stop >>${ZLOG} 2>&1
+		if umount --verbose ${ZRAM_LOG}/ >>${ZLOG} 2>&1
 		then
 			echo "umount ${ZRAM_LOG}/" >>${ZLOG}
 		else
 		sleep .1
-			invoke-rc.d rsyslog stop
+			invoke-rc.d rsyslog stop  >>${ZLOG} 2>&1
 			umount --verbose -l ${ZRAM_LOG}/ >>${ZLOG} 2>&1 
 		fi
-		if umount --verbose ${ZDIR}${ZRAM_DEV}/
+		if umount --verbose ${ZDIR}${ZRAM_DEV}/ >>${ZLOG} 2>&1
 		then
 			echo "umount ${ZDIR}{ZRAM_DEV}/" >>${ZLOG}
 		else
 			umount --verbose -l ${ZDIR}{ZRAM_DEV}/ >>${ZLOG} 2>&1 
 		fi
-		if umount --verbose $HDD_LOG/
+		if umount --verbose $HDD_LOG/ >>${ZLOG} 2>&1
 		then
 			echo "umount $HDD_LOG/" >>${ZLOG}
 		else
 			sleep .1
-			invoke-rc.d rsyslog stop
+			invoke-rc.d rsyslog stop  >>${ZLOG} 2>&1
 			umount --verbose -l $HDD_LOG/ >>${ZLOG} 2>&1
 		fi
-		invoke-rc.d rsyslog restart >>${ZLOG} 2>&1
 		DEV_NUM=$(echo "$ZRAM_DEV" | tr -dc '0-9')
 		if [ "$DEV_NUM" = "0" ]
 		then
@@ -72,6 +71,7 @@ case "$1" in
 		else
 			echo "$DEV_NUM" > /sys/class/zram-control/hot_remove
 		fi
+		invoke-rc.d rsyslog restart >>${ZLOG} 2>&1
 		;;
 
 	*)

@@ -1,18 +1,15 @@
 [Unit]
 Description=log2zram
-DefaultDependencies=no
-Before=basic.target rsyslog.service syslog.target systemd-journald.service sysinit.target shutdown.target apache2.service zram-swap-config.service 
 After=local-fs.target
-Conflicts=shutdown.target reboot.target halt.target
-
-
+Before=reboot.target halt.target zram-swap-config.service zramdrive.service
 
 [Service]
 Type=oneshot
-ExecStart= /usr/local/bin/log2zram start
-ExecStop= /usr/local/bin/log2zram stop
-TimeoutStartSec=120
+ExecStart=/usr/local/bin/log2zram start
+ExecStop=/usr/local/bin/log2zram stop
+TimeoutSec=180
 RemainAfterExit=yes
 
 [Install]
-WantedBy=sysinit.target
+WantedBy=basic.target
+
