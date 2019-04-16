@@ -9,8 +9,8 @@ Conflicts=shutdown.target reboot.target halt.target
 
 [Service]
 Type=oneshot
-ExecStart= /usr/local/bin/log2zram/log2zram start
-ExecStop= /usr/local/bin/log2zram/log2zram stop
+ExecStart= /usr/local/bin/log2zram start
+ExecStop= /usr/local/bin/log2zram stop
 TimeoutStartSec=120
 RemainAfterExit=yes
 

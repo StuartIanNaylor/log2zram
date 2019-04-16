@@ -2,39 +2,15 @@
 
 . /etc/log2zram.conf
 
-HDD_LOG=/var/hdd.log
-PRUNE_LOG_LOG=/var/prune.log
+
 ZRAM_LOG=/var/log
-
-isSafe () {
-	[ -d $HDD_LOG/ ] || echo "ERROR: $HDD_LOG/ doesn't exist! Can't sync." 
-	[ -d $HDD_LOG/ ] || exit 1
-}
-
-syncToDisk () {
-	isSafe
-	cp -arvfu $ZRAM_LOG -T $HDD_LOG
-}
-
-syncFromDisk () {
-	isSafe
-	getUsage
-	LOG_SIZE=$(du -sk $HDD_LOG/ | awk '{ print $1 }')
-	if [ "$BYTES_AVAIL" -lt "$LOG_SIZE" ];then
-		echo "ERROR: RAM disk too small. Can't sync." 
-			cp -arvf $HDD_LOG -T $PRUNE_LOG
-			rm -rf $HDD_LOG/oldlog/* 
-			exit 1
-	fi
-	cp -arvf $HDD_LOG -T $ZRAM_LOG || exit 1
-}
-
+ZSHARE=/usr/local/share/log2zram
+ZLOG=${ZSHARE}/log/zram-config.log
 
 
 createZramLogDrive () {
 	# Check Zram Class created
-	if [ ! -d "/sys/class/zram-control" ]; then
-		modprobe --verbose zram
+	if modprobe --verbose --first-time zram; then
 		ZRAM_DEV='0'
 	else
 		ZRAM_DEV=$(cat /sys/class/zram-control/hot_add)
@@ -42,55 +18,64 @@ createZramLogDrive () {
 	echo ${COMP_ALG} > /sys/block/zram${ZRAM_DEV}/comp_algorithm
 	echo ${LOG_DISK_SIZE} > /sys/block/zram${ZRAM_DEV}/disksize
 	echo ${SIZE} > /sys/block/zram${ZRAM_DEV}/mem_limit
-	mke2fs -v -t ext4 /dev/zram${ZRAM_DEV}
-}
-
-getUsage () {
-	BYTES_AVAIL=$(df "/var/log" | tail -1 | awk '{ print $4 }')
-	BYTES_USED=$(df "/var/log" | tail -1 | awk '{ print $3 }')
-	
+	mke2fs -v -t ext4 $MKFS_OPTS /dev/zram${ZRAM_DEV} >>${ZLOG} 2>&1 || return 1
 }
 
 
 case "$1" in
 	start)
-		mount --verbose --bind $ZRAM_LOG/ $HDD_LOG/
-		mount --verbose --make-private $HDD_LOG/
-		createZramLogDrive
-		mount --verbose --types ext4 -o nosuid,noexec,nodev /dev/zram${ZRAM_DEV} ${ZRAM_LOG}/
-		sync
-		syncFromDisk
-		if [ ! -z "$LOGROTATE_FREQ" ]
-		then
-			mv -f /etc/cron.daily/logrotate /usr/local/bin/log2zram/logrotate
-		fi
-		nohup /usr/local/bin/log2zram/log2zram-schd > /dev/null 2>&1 &
+		echo "log2zram start $(date +%Y-%m-%d-%H:%M:%S)" >>${ZLOG}
+		invoke-rc.d rsyslog stop >>${ZLOG} 2>&1 || exit 1
+		mkdir -p $HDD_LOG  >>${ZLOG} 2>&1 || exit 1
+		mount --verbose --bind $ZRAM_LOG/ $HDD_LOG/ >>${ZLOG} 2>&1 || exit 1
+		mount --verbose --make-private $HDD_LOG/ >>${ZLOG} 2>&1 || exit 1
+		createZramLogDrive >>${ZLOG} 2>&1 || exit 1
+		mkdir -vp ${ZDIR}/zram${ZRAM_DEV} >>${ZLOG} 2>&1 || exit 1
+		mount --verbose --types ext4 $MNT_OPTS /dev/zram${ZRAM_DEV} ${ZDIR}/zram${ZRAM_DEV}/ >>${ZLOG} 2>&1 || exit 1
+		mkdir -vp ${ZDIR}/zram${ZRAM_DEV}/upper ${ZDIR}/zram${ZRAM_DEV}/workdir ${TARGET_DIR} >>${ZLOG} 2>&1 || exit 1
+		mount --verbose --types overlay -o redirect_dir=off,lowerdir=${ZDIR}${BIND_DIR},upperdir=${ZDIR}/zram${ZRAM_DEV}/upper,workdir=${ZDIR}/zram${ZRAM_DEV}/workdir overlay${ZRAM_DEV} ${ZRAM_LOG} >>${ZLOG} 2>&1 || exit 1
+		echo "/zram${ZRAM_DEV}" > ${ZSHARE}/zram-device-list
+		invoke-rc.d rsyslog restart >>${ZLOG} 2>&1 || exit 1
 		;;
 
 	stop)
-		kill $(cat /usr/local/bin/log2zram/log2zram-schd-pid)
-		syncToDisk
-		umount -l $ZRAM_LOG/
-		umount -l $HDD_LOG/
-		if [ ! -z "$LOGROTATE_FREQ" ]
+		echo "log2zram stop $(date +%Y-%m-%d-%H:%M:%S)" >>${ZLOG}
+		ZRAM_DEV=$(cat ${ZSHARE}/zram-device-list)
+		invoke-rc.d rsyslog stop >>${ZLOG} 2>&1 || exit 1
+		if umount --verbose ${ZRAM_LOG}/
 		then
-			cp /usr/local/bin/log2zram/logrotate /etc/cron.daily/logrotate
+			echo "umount ${ZRAM_LOG}/" >>${ZLOG}
+		else
+		sleep .1
+			invoke-rc.d rsyslog stop
+			umount --verbose -l ${ZRAM_LOG}/ >>${ZLOG} 2>&1 
 		fi
-		;;
-		
-	write)
-		echo 'log2zram: writeToHdd'  2>&1 | logger &
-		cp -arvfu $ZRAM_LOG -T $HDD_LOG 2>&1 | logger &
-		;;
-		
-	prune)
-		echo 'log2zram: pruneOldlog'  2>&1 | logger &
-		cp -arvfu $ZRAM_LOG -T $PRUNE_LOG 2>&1 | logger &
-		rm -rf $ZRAM_LOG/oldlog/*
+		if umount --verbose ${ZDIR}${ZRAM_DEV}/
+		then
+			echo "umount ${ZDIR}{ZRAM_DEV}/" >>${ZLOG}
+		else
+			umount --verbose -l ${ZDIR}{ZRAM_DEV}/ >>${ZLOG} 2>&1 
+		fi
+		if umount --verbose $HDD_LOG/
+		then
+			echo "umount $HDD_LOG/" >>${ZLOG}
+		else
+			sleep .1
+			invoke-rc.d rsyslog stop
+			umount --verbose -l $HDD_LOG/ >>${ZLOG} 2>&1
+		fi
+		invoke-rc.d rsyslog restart >>${ZLOG} 2>&1
+		DEV_NUM=$(echo "$ZRAM_DEV" | tr -dc '0-9')
+		if [ "$DEV_NUM" = "0" ]
+		then
+			rmmod zram
+		else
+			echo "$DEV_NUM" > /sys/class/zram-control/hot_remove
+		fi
 		;;
 
 	*)
-		echo "Usage: log2ram {start|stop|write|prune}" >&2
+		echo "Usage: log2ram {start|stop}" >&2
 		exit 1
-	;;
+		
 esac
