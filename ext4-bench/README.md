@@ -1,7 +1,22 @@
 Disk speed benchmarks of 1200M Disksize with 400M Memlimit with various EXT4 options
 
 `sudo -i` drop to root
-`sync; echo 3 > /proc/sys/vm/drop_caches` before each dd test
+`nano disk-bench`
+```
+sync; echo 3 > /proc/sys/vm/drop_caches
+echo "dd bs=1M count=1024 if=/dev/zero of=/var/log/test conv=fdatasync"
+dd bs=1M count=1024 if=/dev/zero of=/var/log/test conv=fdatasync
+sync; echo 3 > /proc/sys/vm/drop_caches
+echo "dd bs=1M count=1024 if=/dev/zero of=test conv=fdatasync"
+dd bs=1M count=1024 if=/dev/zero of=test conv=fdatasync
+sync; echo 3 > /proc/sys/vm/drop_caches
+echo "dd if=/var/log/test of=/dev/null bs=1M count=1024 status=progress"
+dd if=/var/log/test of=/dev/null bs=1M count=1024 status=progress
+sync; echo 3 > /proc/sys/vm/drop_caches
+echo "dd if=test of=/dev/null bs=1M count=1024 status=progress"
+dd if=test of=/dev/null bs=1M count=1024 status=progress
+```
+`chmod a+x disk-bench`
 
 1st sort of standard options for EXT4
 ```
