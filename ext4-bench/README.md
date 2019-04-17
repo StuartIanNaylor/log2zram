@@ -3,9 +3,11 @@ Disk speed benchmarks of 1200M Disksize with 400M Memlimit with various EXT4 opt
 `sudo -i` drop to root
 `nano disk-bench`
 ```
+rm /var/log/test
 sync; echo 3 > /proc/sys/vm/drop_caches
 echo "dd bs=1M count=1024 if=/dev/zero of=/var/log/test conv=fdatasync"
 dd bs=1M count=1024 if=/dev/zero of=/var/log/test conv=fdatasync
+rm test
 sync; echo 3 > /proc/sys/vm/drop_caches
 echo "dd bs=1M count=1024 if=/dev/zero of=test conv=fdatasync"
 dd bs=1M count=1024 if=/dev/zero of=test conv=fdatasync
