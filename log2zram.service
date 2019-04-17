@@ -7,7 +7,7 @@ Before=reboot.target halt.target zram-swap-config.service zramdrive.service
 Type=oneshot
 ExecStart=/usr/local/bin/log2zram start
 ExecStop=/usr/local/bin/log2zram stop
-TimeoutSec=180
+TimeoutSec=240
 RemainAfterExit=yes
 
 [Install]

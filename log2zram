@@ -10,7 +10,8 @@ ZLOG=${ZSHARE}/log/log2zram.log
 
 createZramLogDrive () {
 	# Check Zram Class created
-	if modprobe --verbose --first-time zram; then
+	if modprobe --verbose --first-time zram  >>${ZLOG} 2>&1
+	then
 		DEV_NUM='0'
 	else
 		DEV_NUM=$(cat /sys/class/zram-control/hot_add)
