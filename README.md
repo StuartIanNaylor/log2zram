@@ -107,3 +107,7 @@ From the command line, enter `cd <path_to_local_repo>` so that you can enter com
 Enter `git add --all` at the command line to add the files or changes to the repository
 Enter `git commit -m '<commit_message>'` at the command line to commit new files/changes to the local repository. For the <commit_message> , you can enter anything that describes the changes you are committing.
 Enter `git push`  at the command line to copy your files from your local repository to remote.
+
+## Overlayfs-tools Compilation Problems
+If you're having problems compiling overlayfs-tools due to a kernel and stdlib header mismatch see here:
+https://github.com/systemd/systemd/commit/75720bff62a84896e9a0654afc7cf9408cf89a38
