@@ -5,7 +5,7 @@ systemctl -q is-active log2zram  && { echo "ERROR: log2zram service is still run
 [ -d /usr/local/bin/log2zram ] && { echo "Log2Zram is already installed, uninstall first"; exit 1; }
 
 #apt-get install libattr1-dev -y already part of core
-git clone -b fix_xattr_lib_include https://github.com/Izual7
+git clone -b fix_xattr_lib_include https://github.com/Izual750/overlayfs-tools
 cd overlayfs-tools
 make
 cd ..
