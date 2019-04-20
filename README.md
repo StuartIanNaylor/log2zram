@@ -19,6 +19,7 @@ _____
 4. [Uninstall](#uninstall-)
 
 ## Install
+Various branches are provided for distro / kernel version select a branch with `git clone -b <branch> https://github.com/StuartIanNaylor/log2zram`
     sudo apt-get install git
     git clone https://github.com/StuartIanNaylor/log2zram
     cd log2zram
@@ -107,3 +108,4 @@ From the command line, enter `cd <path_to_local_repo>` so that you can enter com
 Enter `git add --all` at the command line to add the files or changes to the repository
 Enter `git commit -m '<commit_message>'` at the command line to commit new files/changes to the local repository. For the <commit_message> , you can enter anything that describes the changes you are committing.
 Enter `git push`  at the command line to copy your files from your local repository to remote.
+If you have distro or kernel changes just shout and I will create a branch for you or even just code preference
