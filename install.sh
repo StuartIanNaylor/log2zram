@@ -4,8 +4,8 @@ systemctl -q is-active log2zram  && { echo "ERROR: log2zram service is still run
 [ "$(id -u)" -eq 0 ] || { echo "You need to be ROOT (sudo can be used)"; exit 1; }
 [ -d /usr/local/bin/log2zram ] && { echo "Log2Zram is already installed, uninstall first"; exit 1; }
 
-apt-get install libattr1-dev -y
-git clone https://github.com/kmxz/overlayfs-tools
+#apt-get install libattr1-dev -y already part of core
+git clone -b fix_xattr_lib_include https://github.com/Izual7
 cd overlayfs-tools
 make
 cd ..
