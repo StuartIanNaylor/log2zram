@@ -7,9 +7,6 @@ ZRAM_LOG=/var/log
 ZSHARE=/usr/local/share/log2zram
 ZLOG=${ZSHARE}/log/log2zram.log
 
-function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
-# set -x
-
 createZramLogDrive () {
 	# Check Zram Class created
 	if modprobe --verbose --first-time zram  >>${ZLOG} 2>&1
@@ -28,24 +25,22 @@ mergeOverlay () {
 	echo "overlay lowerdir=${HDD_LOG},upperdir=${ZDIR}/zram${DEV_NUM}/upper" >>${ZLOG}
 	cd /usr/local/lib/log2zram/
 	./overlay merge -l "${HDD_LOG}" -u "${ZDIR}/zram${DEV_NUM}/upper" >>${ZLOG} 2>&1 || return 1
-	sh -x *.sh  >>${ZLOG} 2>&1 || return 1
+	sh *.sh  >>${ZLOG} 2>&1 || return 1
 	rm -v *.sh  >>${ZLOG} 2>&1 || return 1
 }
 
 case "$1" in
 	start)
-		set -e
 		echo "log2zram start $(date +%Y-%m-%d-%H:%M:%S)" >>${ZLOG}
 		invoke-rc.d rsyslog stop >>${ZLOG} 2>&1
 		mkdir -p $HDD_LOG  >>${ZLOG} 2>&1
-		mount --verbose --bind $ZRAM_LOG/ $HDD_LOG/ >>${ZLOG} 2>&1
+		mount --verbose --bind $ZRAM_LOG/ $HDD_LOG/ >>${ZLOG} 2>&1 || exit 1
 		mount --verbose --make-private $HDD_LOG/ >>${ZLOG} 2>&1
-		createZramLogDrive >>${ZLOG} 2>&1
+		createZramLogDrive >>${ZLOG} 2>&1 || exit 1
 		mkdir -vp ${ZDIR}/zram${DEV_NUM} >>${ZLOG} 2>&1
-		mount --verbose --types ext4 $MNT_OPTS /dev/zram${DEV_NUM} ${ZDIR}/zram${DEV_NUM}/ >>${ZLOG} 2>&1
+		mount --verbose --types ext4 $MNT_OPTS /dev/zram${DEV_NUM} ${ZDIR}/zram${DEV_NUM}/ >>${ZLOG} 2>&1 || exit 1
 		mkdir -vp ${ZDIR}/zram${DEV_NUM}/upper ${ZDIR}/zram${DEV_NUM}/workdir ${ZRAM_LOG} >>${ZLOG} 2>&1
-		[ $(version `uname -r`) -le $(version "4.10") ] || IV_X_OPTS="redirect_dir=off,"
-		mount --verbose --types overlay -o ${IV_X_OPTS}lowerdir=${HDD_LOG},upperdir=${ZDIR}/zram${DEV_NUM}/upper,workdir=${ZDIR}/zram${DEV_NUM}/workdir overlay${DEV_NUM} ${ZRAM_LOG} >>${ZLOG} 2>&1
+		mount --verbose --types overlay -o lowerdir=${HDD_LOG},upperdir=${ZDIR}/zram${DEV_NUM}/upper,workdir=${ZDIR}/zram${DEV_NUM}/workdir overlay${DEV_NUM} ${ZRAM_LOG} >>${ZLOG} 2>&1 || exit 1
 		echo "/zram${DEV_NUM}" > ${ZSHARE}/zram-device-list
 		invoke-rc.d rsyslog restart >>${ZLOG} 2>&1
 		journalctl --flush >>${ZLOG} 2>&1
@@ -65,7 +60,7 @@ case "$1" in
 			invoke-rc.d rsyslog stop  >>${ZLOG} 2>&1
 			umount --verbose -l ${ZRAM_LOG}/ >>${ZLOG} 2>&1
 		fi
-		mergeOverlay >>${ZLOG} 2>&1
+		mergeOverlay >>${ZLOG} 2>&1 || exit 1
 		if umount --verbose ${ZDIR}${ZRAM_DEV}/ >>${ZLOG} 2>&1
 		then
 			echo "umount ${ZDIR}${ZRAM_DEV}/" >>${ZLOG}
