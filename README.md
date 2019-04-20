@@ -20,6 +20,7 @@ _____
 
 ## Install
 Various branches are provided for distro / kernel version select a branch with `git clone -b <branch> https://github.com/StuartIanNaylor/log2zram`
+
     sudo apt-get install git
     git clone https://github.com/StuartIanNaylor/log2zram
     cd log2zram
