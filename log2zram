@@ -32,7 +32,6 @@ mergeOverlay () {
 case "$1" in
 	start)
 		echo "log2zram start $(date +%Y-%m-%d-%H:%M:%S)" >>${ZLOG}
-		invoke-rc.d rsyslog stop >>${ZLOG} 2>&1
 		mkdir -p $HDD_LOG  >>${ZLOG} 2>&1
 		mount --verbose --bind $ZRAM_LOG/ $HDD_LOG/ >>${ZLOG} 2>&1 || exit 1
 		mount --verbose --make-private $HDD_LOG/ >>${ZLOG} 2>&1
@@ -42,7 +41,6 @@ case "$1" in
 		mkdir -vp ${ZDIR}/zram${DEV_NUM}/upper ${ZDIR}/zram${DEV_NUM}/workdir ${ZRAM_LOG} >>${ZLOG} 2>&1
 		mount --verbose --types overlay -o lowerdir=${HDD_LOG},upperdir=${ZDIR}/zram${DEV_NUM}/upper,workdir=${ZDIR}/zram${DEV_NUM}/workdir overlay${DEV_NUM} ${ZRAM_LOG} >>${ZLOG} 2>&1 || exit 1
 		echo "/zram${DEV_NUM}" > ${ZSHARE}/zram-device-list
-		invoke-rc.d rsyslog restart >>${ZLOG} 2>&1
 		journalctl --flush >>${ZLOG} 2>&1
 		exit 0
 		;;
@@ -51,13 +49,11 @@ case "$1" in
 		echo "log2zram stop $(date +%Y-%m-%d-%H:%M:%S)" >>${ZLOG}
 		ZRAM_DEV=$(cat ${ZSHARE}/zram-device-list)
 		DEV_NUM=$(echo "$ZRAM_DEV" | tr -dc '0-9')
-		invoke-rc.d rsyslog stop >>${ZLOG} 2>&1
 		if umount --verbose ${ZRAM_LOG}/ >>${ZLOG} 2>&1
 		then
 			echo "umount ${ZRAM_LOG}/" >>${ZLOG}
 		else
 		sleep .1
-			invoke-rc.d rsyslog stop  >>${ZLOG} 2>&1
 			umount --verbose -l ${ZRAM_LOG}/ >>${ZLOG} 2>&1
 		fi
 		mergeOverlay >>${ZLOG} 2>&1 || exit 1
@@ -72,7 +68,6 @@ case "$1" in
 			echo "umount $HDD_LOG/" >>${ZLOG}
 		else
 			sleep .1
-			invoke-rc.d rsyslog stop  >>${ZLOG} 2>&1
 			umount --verbose -l $HDD_LOG/ >>${ZLOG} 2>&1
 		fi
 		if [ "$DEV_NUM" = "0" ]
@@ -81,7 +76,6 @@ case "$1" in
 		else
 			echo "$DEV_NUM" > /sys/class/zram-control/hot_remove
 		fi
-		invoke-rc.d rsyslog restart >>${ZLOG} 2>&1
 		exit 0
 		;;
 
