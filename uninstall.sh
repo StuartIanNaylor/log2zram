@@ -2,7 +2,7 @@
 
 if [ "$(id -u)" -eq 0 ]
 then
-	service log2zram stop
+	systemctl stop log2zram 
 	systemctl disable log2zram
 	rm /etc/systemd/system/log2zram.service
 	rm /usr/local/bin/log2zram
