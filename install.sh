@@ -22,3 +22,6 @@ install -m 755 overlayfs-tools/overlay /usr/local/lib/log2zram/overlay
 mkdir -p /usr/local/share/log2zram/log
 systemctl enable log2zram
 
+echo "#####          Reboot to activate log2zram         #####"
+echo "##### edit /etc/log2zram.conf to configure options #####"
+
