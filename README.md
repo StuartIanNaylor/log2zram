@@ -1,3 +1,5 @@
+Not supported anymore look at https://github.com/StuartIanNaylor/zram-config as does the same and also further zram config if required
+
 # Log2Zram
 
 Usefull for IoT / maker projects for reducing SD, Nand and Emmc block wear via log operations.
