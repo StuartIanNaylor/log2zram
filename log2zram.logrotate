@@ -1,13 +1,11 @@
-olddir /opt/zram/log.old
-createolddir 755 root root
-renamecopy
-
-/usr/local/share/log2zram/log/log2zram.log
-{
-	rotate 7
-	daily
-	missingok
-	notifempty
-	delaycompress
-	compress
+/usr/local/share/log2zram/log/log2zram.log {
+        olddir /opt/zram/log.old
+        createolddir 755 root root
+        renamecopy
+        rotate 7
+        daily
+        compress
+        delaycompress
+        missingok
+        notifempty
 }
